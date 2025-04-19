@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Velocity X</title>
+    <style>
+        body {
+            background-color: #399a7a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        nav h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        nav ul li a:hover {
+            color: #00e5ff;
+        }
+        .faq-container {
+            padding: 100px 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .faq-item {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .faq-question {
+            font-weight: bold;
+        }
+        .faq-answer {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Velocity X</h1>
+        <ul>
+            <li><a href="Home.html">Home</a></li>
+            <li><a href="FAQpage.html">FAQ</a></li>
+            <li><a href="Home.html#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="faq-container">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item" onclick="toggleAnswer(this)">
+            <div class="faq-question">Q.What types of clothing do you sell?</div>
+            <div class="faq-answer">We offer a wide range of clothing, including t-shirts, pants, caps, jackets, and more. Our collection is designed to suit different styles and occasions.
+
+            </div>
+        </div>
+        <div class="faq-item" onclick="toggleAnswer(this)">
+            <div class="faq-question">Q.How do I place an order?</div>
+            <div class="faq-answer">Yes! You can find our size guide on each product page.</div>
+        </div>
+        <div class="faq-item" onclick="toggleAnswer(this)">
+            <div class="faq-question">Q.What payment methods do you accept?</div>
+            <div class="faq-answer"> We accept major credit/debit cards, PayPal, and other secure payment options. You can check the available payment methods at checkout.</div>
+        </div>
+        <div class="faq-item" onclick="toggleAnswer(this)">
+            <div class="faq-question">Q.Can I modify or cancel my order after placing it?</div>
+            <div class="faq-answer">We process orders quickly, so changes or cancellations are only possible within a short window after ordering. Contact us as soon as possible for assistance.</div>
+        </div>
+        <div class="faq-item" onclick="toggleAnswer(this)">
+            <div class="faq-question">Q: What is your return policy?</div>
+            <div class="faq-answer">A: We accept returns within [X] days of delivery, provided the item is unworn, unwashed, and in its original packaging. Read our full return policy for details.</div>
+        </div>
+        <div class="faq-item" onclick="toggleAnswer(this)">
+            <div class="faq-question">Q: How can I contact customer support?</div>
+            <div class="faq-answer">A: You can reach us via email at [your email], or through our contact form on the website. Our support team is available [your business hours].</div>
+    </div>
+    <script>
+        function toggleAnswer(element) {
+            let answer = element.querySelector('.faq-answer');
+            answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

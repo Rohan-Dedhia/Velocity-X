@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity X</title>
+    <style>
+        body {
+            background-color: #399a7a;
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        nav {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        nav h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            position: relative;
+            left: -30px; 
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        nav ul li a:hover {
+            color: #00e5ff;
+        }
+        .header {
+            text-align: center;
+            padding: 120px 20px 50px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            transition: color 0.3s;
+        }
+        .header h1:hover {
+            color: #00e5ff;
+        }
+        .header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+        .header h3:hover {
+            color: #00e5ff;
+        }
+        .content {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            margin: 20px;
+            border-radius: 10px;
+        }
+        .content h2, .content p {
+            transition: color 0.3s;
+        }
+        .content h2:hover, .content p:hover {
+            color: #00e5ff;
+        }
+        .product {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .product-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            max-width: 300px;
+        }
+        .product-item img {
+            max-width: 100%;
+            border-radius: 10px;
+            height: 200px; 
+            object-fit: cover;
+        }
+        .product-item h3, .product-item p {
+            transition: color 0.3s;
+        }
+        .product-item h3:hover, .product-item p:hover {
+            color: #00e5ff;
+        }
+        .product-item a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #00e5ff;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .product-item a:hover {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Velocity X</h1>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="FAQpage.html">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="header" id="home">
+        <h1>Velocity X</h1>
+        <h3>Unleash Your Speed, Elevate Your Game.</h3>
+    </div>
+    <div class="content" id="about">
+        <h2>About Us</h2>
+        <p>At Velocity X, we blend style and performance to create high-quality apparel for every occasion. Whether you're looking for trendy streetwear or comfortable sportswear, our collection is designed to keep you looking sharp and feeling confident.</p>
+    </div>
+    <div class="content" id="products">
+        <h2>Our Products</h2>
+        <div class="product">
+            <div class="product-item">
+                <img src="images/classic-tshirt.jpg" alt="Classic T-Shirts">
+                <h3>Classic T-Shirts</h3>
+                <p>Timeless style and ultimate comfort.</p>
+                <a href="shop_tees.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/sneakers.jpg" alt="Sneakers">
+                <h3>Sneakers</h3>
+                <p>Designed for performance and street style.</p>
+                <a href="sneaker.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/trendy-cap.jpg" alt="Trendy Cap">
+                <h3>Trendy Cap</h3>
+                <p>Perfect for any occasion.</p>
+                <a href="shop-trendy-cap.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/stylish-jacket.jpg" alt="Stylish Jacket">
+                <h3>Stylish Jacket</h3>
+                <p>Stay warm with elegance.</p>
+                <a href="shop-stylish-jacket.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/comfy-hoodie.jpg" alt="Comfy Hoodie">
+                <h3>Comfy Hoodie</h3>
+                <p>Cozy up in ultimate comfort.</p>
+                <a href="shop-comfy-hoodie.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/sunglasses.jpg" alt="Sunglasses">
+                <h3>Cool Sunglasses</h3>
+                <p>Protect your eyes in style.</p>
+                <a href="shop-sunglasses.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/elegant-watch.jpg" alt="Elegant Watch">
+                <h3>Elegant Watch</h3>
+                <p>Timekeeping with sophistication.</p>
+                <a href="shop-elegant-watch.html">Shop Now</a>
+            </div>
+            <div class="product-item">
+                <img src="images/fashionable-bags.jpg" alt="Fashionable Bags">
+                <h3>Fashionable Bags</h3>
+                <p>Carry your essentials in style.</p>
+                <a href="shop-fashionable-bags.html">Shop Now</a>
+            </div>
+        </div>
+    </div>
+    <div class="content" id="contact">
+        <h2>Contact Us</h2>
+        <p>Email: support@velocityxгруппа крови.com</p>
+        <p>Phone: +1 (555) 123-4567</p>
+    </div>
+</body>
+</html>

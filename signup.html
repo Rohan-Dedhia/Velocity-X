@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Velocity X</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #399a7a;
+            text-align: center;
+            padding: 50px;
+            color: #fff;
+        }
+        form {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #00e5ff;
+            color: black;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 85%;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #fff;
+        }
+        .message {
+            margin-top: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Velocity X - Sign Up</h1>
+    <h2>Create Your Account</h2>
+    <form id="signupForm">
+        <input type="email" id="email" placeholder="Enter Email ID" required>
+        <input type="tel" id="phone" placeholder="Enter Phone Number" pattern="[0-9]{10}" required>
+        <input type="text" id="username" placeholder="Enter Username" required>
+        <input type="password" id="password" placeholder="Enter Password" required>
+        <input type="password" id="confirmPassword" placeholder="Re-enter Password" required>
+        <button type="submit">Sign Up</button>
+        <p class="message" id="signupMessage"></p>
+    </form>
+    <p>Already have an account? <a href="loginpage.html" style="color: #00e5ff;">Login here</a></p>
+
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var email = document.getElementById("email").value;
+            var phone = document.getElementById("phone").value;
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var message = document.getElementById("signupMessage");
+
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            var phonePattern = /^[0-9]{10}$/;
+
+            if (!emailPattern.test(email)) {
+                message.style.color = "red";
+                message.textContent = "Invalid Email ID.";
+                return;
+            }
+
+            if (!phonePattern.test(phone)) {
+                message.style.color = "red";
+                message.textContent = "Phone number must be 10 digits.";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                message.style.color = "red";
+                message.textContent = "Passwords do not match.";
+                return;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "signup.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onload = function () {
+                var response = JSON.parse(this.responseText);
+                if (response.status === "success") {
+                    message.style.color = "green";
+                    message.textContent = "Signup successful! Redirecting...";
+                    setTimeout(() => window.location.href = "loginpage.html", 2000);
+                } else {
+                    message.style.color = "red";
+                    message.textContent = response.message;
+                }
+            };
+
+            xhr.send(`email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+        });
+    </script>
+</body>
+</html>

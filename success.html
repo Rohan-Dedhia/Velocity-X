@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - Velocity X</title>
+    <style>
+        body { 
+            background-color: #399a7a; 
+            font-family: Arial, sans-serif; 
+            color: #fff; 
+            text-align: center; 
+            padding: 100px; 
+        }
+        a { 
+            color: #00e5ff; 
+            text-decoration: none; 
+        }
+        a:hover { 
+            text-decoration: underline; 
+        }
+        .review-container {
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .review-container h2 {
+            margin-bottom: 10px;
+        }
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .star {
+            font-size: 25px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.3s;
+        }
+        .star.selected {
+            color: #ffcc00;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+        button {
+            background-color: #00e5ff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #fff;
+        }
+        .reviews-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .review-item {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .review-item strong {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thank You!</h1>
+    <p>Your order has been placed successfully.</p>
+    <p>Order ID: <span id="order-id">N/A</span></p>
+    <a href="Home.html">Back to Home</a>
+
+    <script>
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Get the order_id from the URL
+        const orderId = getQueryParam('order_id');
+
+        // Update the order-id element
+        const orderIdElement = document.getElementById('order-id');
+        if (orderId && orderId !== 'undefined' && orderId !== 'null') {
+            orderIdElement.textContent = orderId;
+        } else {
+            orderIdElement.textContent = 'N/A';
+        }
+
+        // Optional: Log for debugging
+        console.log('Order ID from URL:', orderId);
+    </script>
+
+    <!-- Review Section -->
+    <div class="review-container">
+        <h2>Leave a Review</h2>
+        <div class="stars" id="star-rating">
+            <span class="star" data-value="1">&#9733;</span>
+            <span class="star" data-value="2">&#9733;</span>
+            <span class="star" data-value="3">&#9733;</span>
+            <span class="star" data-value="4">&#9733;</span>
+            <span class="star" data-value="5">&#9733;</span>
+        </div>
+        <textarea id="review-text" placeholder="Write your review here..."></textarea>
+        <button onclick="submitReview()">Submit Review</button>
+
+        <div class="reviews-list" id="reviews-list"></div>
+    </div>
+
+    <script>
+        let selectedRating = 0;
+    
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function () {
+                selectedRating = this.getAttribute('data-value');
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+                for (let i = 0; i < selectedRating; i++) {
+                    document.querySelectorAll('.star')[i].classList.add('selected');
+                }
+            });
+        });
+    
+        function submitReview() {
+            const reviewText = document.getElementById('review-text').value.trim();
+            const orderId = document.getElementById('order-id').textContent;
+    
+            if (selectedRating === 0 || reviewText === '') {
+                alert('Please provide a rating and review text.');
+                return;
+            }
+    
+            // Send review to backend
+            fetch('save_review.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `order_id=${orderId}&rating=${selectedRating}&review_text=${encodeURIComponent(reviewText)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert('Review submitted successfully!');
+                    document.getElementById('review-text').value = '';
+                    selectedRating = 0;
+                    document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+                    loadReviews();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        }
+    
+        function loadReviews() {
+            fetch('fetch_reviews.php')
+            .then(response => response.json())
+            .then(reviews => {
+                const reviewsList = document.getElementById('reviews-list');
+                reviewsList.innerHTML = '';
+    
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = '<p>No reviews yet.</p>';
+                    return;
+                }
+    
+                reviews.forEach(review => {
+                    const reviewItem = document.createElement('div');
+                    reviewItem.classList.add('review-item');
+                    reviewItem.innerHTML = `<strong>${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</strong> 
+                                            <p>${review.review_text}</p>
+                                            <small>Order ID: ${review.order_id}</small>`;
+                    reviewsList.appendChild(reviewItem);
+                });
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', loadReviews);
+    </script>
+    
+</body>
+</html>

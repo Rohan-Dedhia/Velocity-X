@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Velocity X</title>
+    <style>
+        body {
+            background-color: #399a7a;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }        
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 50px;
+            border-radius: 10px;
+            text-align: center;
+            width: 40%;
+            max-width: 500px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+        }
+        .login-btn {
+            background-color: #00e5ff;
+            color: #000;
+            border: none;
+            padding: 15px 20px;
+            width: 100%;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .login-btn:hover {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Velocity X</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+    </div>
+</body>
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "login.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onload = function () {
+        var response = JSON.parse(this.responseText);
+        if (response.status === "success") {
+            window.location.href = "Home.html";
+        } else {
+            alert(response.message);
+        }
+    };
+
+    xhr.send("username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
+});
+</script>
+</html>

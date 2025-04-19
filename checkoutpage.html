@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Velocity X</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body { background-color: #399a7a; font-family: Arial, sans-serif; color: #fff; }
+        nav { background-color: rgba(0, 0, 0, 0.7); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        nav ul { list-style: none; display: flex; padding: 0; margin: 0; }
+        nav ul li { margin: 0 15px; }
+        nav ul li a { color: #fff; text-decoration: none; font-weight: bold; transition: color 0.3s; }
+        nav ul li a:hover { color: #00e5ff; }
+        .container { padding: 50px; display: flex; gap: 20px; justify-content: center; }
+        .cart-summary, .checkout-details { background-color: #fff; color: #000; padding: 20px; border-radius: 10px; width: 45%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); }
+        .cart-item { border-bottom: 1px solid #ccc; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .cart-item:last-child { border-bottom: none; }
+        .remove-item { background-color: red; color: white; padding: 5px; border-radius: 5px; cursor: pointer; }
+        #total-price { font-size: 1.5rem; margin-top: 20px; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 10px; background-color: #00e5ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #fff; }
+        .payment-details { display: none; margin-top: 20px; }
+        #card-element { background-color: rgba(255, 255, 255, 0.2); padding: 10px; border-radius: 5px; }
+        #card-errors { color: red; margin-top: 10px; }
+        .test-mode-banner { 
+            background: #ffcc00; 
+            color: #000; 
+            padding: 10px; 
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #00e5ff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Velocity X</h1>
+        <ul>
+            <li><a href="Home.html">Home</a></li>
+            <li><a href="Home.html#products">Shop More</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="cart-summary">
+            <h2>Your Cart</h2>
+            <div class="test-mode-banner">TEST MODE: Use card 4242 4242 4242 4242</div>
+            <div class="cart-items" id="cart-items"></div>
+            <div id="total-price">Total: ₹0</div>
+        </div>
+        <div class="checkout-details">
+            <h2>Checkout Details</h2>
+            <form id="checkoutForm">
+                <h3>Delivery Address</h3>
+                <input type="text" name="fullName" placeholder="Full Name" required>
+                <input type="text" name="streetAddress" placeholder="Street Address" required>
+                <input type="text" name="city" placeholder="City" required>
+                <input type="text" name="postalCode" placeholder="Postal Code" required>
+                
+                <h3>Payment Method</h3>
+                <select id="payment-method" name="paymentMethod" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="card">Credit/Debit Card</option>
+                    <option value="upi">UPI</option>
+                    <option value="cod">Cash on Delivery</option>
+                </select>
+
+                <!-- Stripe Card Payment -->
+                <div id="card-details" class="payment-details">
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert"></div>
+                </div>
+
+                <!-- UPI Payment -->
+                <div id="upi-details" class="payment-details">
+                    <input type="text" name="upiId" id="upiId" placeholder="Enter UPI ID">
+                </div>
+
+                <!-- Cash on Delivery -->
+                <div id="cod-details" class="payment-details">
+                    <p>Cash on Delivery selected. Please ensure the exact amount is ready upon delivery.</p>
+                </div>
+
+                <button type="submit" id="submit-button">
+                    <span id="button-text">Place Order</span>
+                    <span id="button-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Stripe in test mode
+        const stripe = Stripe('pk_test_51R2VvEBVEttRuUOAngQG0WjBXRDauMVDYgcyGK10YpVv6h90egwZG7wl6sAZdAAKpUA0rPlfae4sOgmV4Ah4R0YT00mVHFgROC');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: { 
+                    fontSize: '16px', 
+                    color: '#000',
+                    '::placeholder': { color: '#ccc' } 
+                },
+            },
+        });
+        cardElement.mount('#card-element');
+
+        // Handle card validation errors
+        cardElement.on('change', (event) => {
+            const displayError = document.getElementById('card-errors');
+            displayError.textContent = event.error ? event.error.message : '';
+        });
+
+        // Cart functionality
+        let totalPrice = 0;
+        
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartContainer = document.getElementById('cart-items');
+            cartContainer.innerHTML = '';
+            totalPrice = 0;
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p>Your cart is empty</p>';
+                document.getElementById('submit-button').disabled = true;
+            } else {
+                cart.forEach((item, index) => {
+                    const qty = item.quantity || 1;
+                    const itemTotal = item.price * qty;
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <div>
+                            <h4>${item.name}</h4>
+                            <p>₹${item.price} x ${qty} = ₹${itemTotal}</p>
+                        </div>
+                        <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
+                    `;
+                    cartContainer.appendChild(itemElement);
+                    totalPrice += itemTotal;
+                });
+            }
+            document.getElementById('total-price').textContent = `Total: ₹${totalPrice}`;
+            
+            // Disable checkout if total is less than 50 INR (Stripe test minimum)
+            if (totalPrice < 50) {
+                document.getElementById('submit-button').disabled = true;
+                document.getElementById('button-text').textContent = 'Minimum ₹50 required';
+            } else {
+                document.getElementById('submit-button').disabled = false;
+                document.getElementById('button-text').textContent = 'Place Order';
+            }
+        }
+
+        function removeFromCart(index) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        // Toggle payment method details
+        document.getElementById('payment-method').addEventListener('change', function() {
+            document.querySelectorAll('.payment-details').forEach(el => (el.style.display = 'none'));
+            const selected = this.value;
+            if (selected) {
+                document.getElementById(`${selected}-details`).style.display = 'block';
+                document.getElementById('upiId').required = selected === 'upi';
+            }
+        });
+
+        // Handle form submission with database integration
+        document.getElementById('checkoutForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const buttonSpinner = document.getElementById('button-spinner');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            buttonText.textContent = 'Processing...';
+            buttonSpinner.style.display = 'inline-block';
+
+            try {
+                // Prepare form data
+                const formData = new FormData(event.target);
+                const data = {
+                    full_name: formData.get('fullName'),
+                    street_address: formData.get('streetAddress'),
+                    city: formData.get('city'),
+                    postal_code: formData.get('postalCode'),
+                    payment_method: formData.get('paymentMethod'),
+                    upi_id: formData.get('upiId') || null,
+                    cartItems: JSON.parse(localStorage.getItem('cart')) || [],
+                    total_amount: totalPrice
+                };
+
+                // 1. First save the order to database via PHP
+                const dbResponse = await fetch('checkout.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                // First check if response is JSON
+                const responseText = await dbResponse.text();
+                let dbResult;
+                try {
+                    dbResult = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Invalid server response: ${responseText.substring(0, 100)}`);
+                }
+
+                if (!dbResponse.ok || dbResult.status !== 'success') {
+                    throw new Error(dbResult.message || 'Failed to save order');
+                }
+
+                const orderId = dbResult.orderId;
+                
+                // 2. Process payment only for card payments
+                if (data.payment_method === 'card') {
+                    // Create Payment Intent
+                    const paymentResponse = await fetch('http://localhost:4242/create-payment-intent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            amount: totalPrice, 
+                            currency: 'inr',
+                            order_id: orderId
+                        })
+                    });
+
+                    if (!paymentResponse.ok) {
+                        throw new Error('Payment processing failed');
+                    }
+
+                    const paymentResult = await paymentResponse.json();
+                    const { clientSecret } = paymentResult;
+                    
+                    // Confirm Payment
+                    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                        payment_method: { card: cardElement }
+                    });
+
+                    if (error) throw error;
+                    
+                    // Update with payment intent ID if successful
+                    const updateResponse = await fetch('checkout.php', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            order_id: orderId,
+                            payment_intent_id: paymentIntent.id
+                        })
+                    });
+
+                    if (!updateResponse.ok) {
+                        console.warn('Failed to update payment intent ID');
+                    }
+                }
+
+                // 3. On success - clear cart and redirect
+                localStorage.removeItem('cart');
+                window.location.href = `success.html?order_id=${orderId}`;
+
+            } catch (error) {
+                console.error('Checkout Error:', error);
+                
+                // Show user-friendly error message
+                let errorMessage = error.message;
+                if (error.message.includes('Unexpected token')) {
+                    errorMessage = 'Server returned an invalid response. Please check console for details.';
+                }
+                
+                alert(`Checkout failed: ${errorMessage}`);
+                
+                // Reset button state
+                submitButton.disabled = false;
+                buttonText.textContent = 'Place Order';
+                buttonSpinner.style.display = 'none';
+            }
+        });
+
+        // Load cart on page load
+        document.addEventListener('DOMContentLoaded', loadCart);
+    </script>
+</body>
+</html>
