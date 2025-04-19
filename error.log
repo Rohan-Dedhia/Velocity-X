@@ -1,4 +1,0 @@
-[30-Mar-2025 13:24:17 Europe/Berlin] PHP Fatal error:  Uncaught Error: mysqli_stmt::bind_param(): Argument #7 cannot be passed by reference in C:\xampp\htdocs\velocity_x\checkout.php:72
-Stack trace:
-#0 {main}
-  thrown in C:\xampp\htdocs\velocity_x\checkout.php on line 72
